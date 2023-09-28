@@ -1,0 +1,24 @@
+<prgm> ::= {<stmt>}
+
+<stmt> ::= "IF" <condi> "THEN" nl {<expr>} nl "ENDIF"
+| "WHILE" <condi> "DO" nl {<expr>} nl "ENDWHILE"
+| "INPUT" <ident>
+| "OUTPUT" <expr | ident | string>
+| "LET" <ident> "=" <expr | string | bool>
+| ("INCR" | "DECR") <ident> (<expr>)?
+| "FOR" <ident> "=" <expr> "TO" <expr> nl {<expr>} nl "NEXT" <ident>
+
+<condi> ::= <expr> ("==" | ">" | ">=" | "<" | "<=" | "!=") <expr>
+<comment> ::= "#" <string>+
+<expr> ::= <term> {("-" | "+") <term>}
+<term> ::= <factor> {("/" | "*") <factor>}
+<factor> ::= ["+" | "-"] <primary>
+<primary> ::= <number> | <string>
+
+
+<nl> ::= '\n'+
+<number> ::= <int_lit> | <real_lit>
+<real_lit> ::= <int_lit>"."<int_lit>
+<string> ::= [A-Za-z]+
+<int_lit> ::= [0-9]+
+<bool> ::= "TRUE" | "FALSE"

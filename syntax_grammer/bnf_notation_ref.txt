@@ -1,0 +1,14 @@
+<...> -> Identifiers (variables, statements etc)
+{...} -> Repeated items (once or more times)
+[...] -> Optional items (0 or more times)
+(...) -> Grouped items
+.. | .. -> Choice of options
+::= -> Is defined as
+
+...* -> Repeated one or more times
+...+ -> Repeated zero or more times
+...? -> Zero or one times only
+
+Keyword Reference:
+<ident> -> Identifier
+nl -> Newlines
