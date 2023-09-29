@@ -9,7 +9,7 @@
 | "FOR" <ident> "=" <expr> "TO" <expr> nl {<expr>} nl "NEXT" <ident>
 
 <condi> ::= <expr> ("==" | ">" | ">=" | "<" | "<=" | "!=") <expr>
-<comment> ::= "#" <string>+
+<comment> ::= "//" <string>+
 <expr> ::= <term> {("-" | "+") <term>}
 <term> ::= <factor> {("/" | "*") <factor>}
 <factor> ::= ["+" | "-"] <primary>
