@@ -1,8 +1,6 @@
 from .token import Token, TokenType
 import sys
 
-TOKENTYPE = TokenType
-
 class Lexer():
     def __init__(self, source):
         self.source = source
@@ -140,6 +138,19 @@ class Lexer():
                     self.nextChar()
             tokenText = self.source[startPos:self.curPos + 1]
             token = Token(tokenText, TokenType.NUMBER)
+        elif self.curChar.isalpha():
+            # Leading character is a letter, so it should be a string
+            # Get consecutive alpha-numeric characters
+            startPos = self.curPos
+            while self.peek().isalpha():
+                self.nextChar()
+            tokenText = self.source[startPos:self.curPos + 1] # Get substring
+            keyword = Token.checkIfKeyword(tokenText) # Check if there are any keywords within the string
+            if keyword == None:
+                token = Token(tokenText, TokenType.IDENT)
+            else:
+                token = Token(tokenText, keyword)
+
         else:
             self.abort(f"Unknown token found: {self.curChar}")
 
