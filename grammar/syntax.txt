@@ -1,10 +1,10 @@
-<prgm> ::= {<stmt>}
+<prgm> ::= <stmt>
 
 <stmt> ::= "IF" <condi> "THEN" nl {<expr>} nl "ENDIF"
 | "WHILE" <condi> "DO" nl {<expr>} nl "ENDWHILE"
 | "INPUT" <ident>
-| "OUTPUT" <expr | ident | string>
-| "LET" <ident> "=" <expr | string | bool>
+| "OUTPUT" <expr | string>
+| "LET" <ident> "=" <expr | string | bool> 
 | ("INCR" | "DECR") <ident> (<expr>)?
 | "FOR" <ident> "=" <expr> "TO" <expr> nl {<expr>} nl "NEXT" <ident>
 

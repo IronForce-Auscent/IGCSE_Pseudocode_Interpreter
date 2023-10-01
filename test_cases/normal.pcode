@@ -1,0 +1,3 @@
+LABEL loop
+OUTPUT "hello, world!"
+GOTO loop

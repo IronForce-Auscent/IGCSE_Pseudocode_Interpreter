@@ -1,30 +1,32 @@
 from .token import Token, TokenType
 import sys
+import logging
 
 class Lexer():
     def __init__(self, source):
-        self.source = source
-        self.curChar = "" # The current character that the lexer is scanning
-        self.curPos = -1 # The current position in the code that the lexer is scanning
-        self.nextChar()
+        self.source = source + '\n'
+        self.logger = logging.getLogger(__name__)
+        self.cur_char = "" # The current character that the lexer is scanning
+        self.cur_pos = -1 # The current position in the code that the lexer is scanning
+        self.next_char()
     
-    def nextChar(self):
+    def next_char(self):
         """
         Processes the next character in the code
         """
-        self.curPos += 1
-        if self.curPos >= len(self.source):
-            self.curChar = "\0" # Returns an EOF character
+        self.cur_pos += 1
+        if self.cur_pos >= len(self.source):
+            self.cur_char = "\0" # Returns an EOF character
         else:
-            self.curChar = self.source[self.curPos]
+            self.cur_char = self.source[self.cur_pos]
 
     def peek(self):
         """
         Returns the lookahead character
         """
-        if self.curPos + 1 >= len(self.source):
+        if self.cur_pos + 1 >= len(self.source):
             return "\0"
-        return self.source[self.curPos + 1]
+        return self.source[self.cur_pos + 1]
 
     def abort(self, message: str):
         """
@@ -33,118 +35,119 @@ class Lexer():
         Arguments:
         message (str): The error message to output
         """
-        sys.exit(f"Lexing error: {message}")
+        self.logger.error(f"Lexing error: {message}")
+        sys.exit("Lexing error, please check the generated logs for more information")
 
-    def skipWhitespace(self):
+    def skip_whitespace(self):
         """
         Skips all whitespaces except newline characters
 
         Newline characters are used to indicate end of statement
         """
-        while self.curChar == ' ' or self.curChar == "\t" or self.curChar == "\r":
-            self.nextChar()
+        while self.cur_char == ' ' or self.cur_char == "\t" or self.cur_char == "\r":
+            self.next_char()
 
-    def skipComment(self):
+    def skip_comment(self):
         """
         Skips all comments
         """
-        if self.curChar == "/" and self.peek() == "/":
-            while self.curChar != "\n":
-                self.nextChar()
+        if self.cur_char == "/" and self.peek() == "/":
+            while self.cur_char != "\n":
+                self.next_char()
 
-    def getToken(self) -> Token:
+    def get_token(self) -> Token:
         """
         Classifies and returns the next token
         """
-        self.skipWhitespace()
-        self.skipComment()
+        self.skip_whitespace()
+        self.skip_comment()
         token = None
 
-        if self.curChar == "+":
-            token = Token(self.curChar, TokenType.PLUS)
-        elif self.curChar == "-":
-            token = Token(self.curChar, TokenType.MINUS)
-        elif self.curChar == "*":
-            token = Token(self.curChar, TokenType.ASTERISK)
-        elif self.curChar == "/":
-            token = Token(self.curChar, TokenType.SLASH)
-        elif self.curChar == "\"":
+        if self.cur_char == "+":
+            token = Token(self.cur_char, TokenType.PLUS)
+        elif self.cur_char == "-":
+            token = Token(self.cur_char, TokenType.MINUS)
+        elif self.cur_char == "*":
+            token = Token(self.cur_char, TokenType.ASTERISK)
+        elif self.cur_char == "/":
+            token = Token(self.cur_char, TokenType.SLASH)
+        elif self.cur_char == "\"":
             # Get the characters between the double quotations
-            self.nextChar()
-            startPos = self.curPos
+            self.next_char()
+            startPos = self.cur_pos
 
-            while self.curChar != "\"":
+            while self.cur_char != "\"":
                 # Restrict all special characters (eg escape, newline, tabs, %)
                 # Makes it easier to compile to C later on
-                if self.curChar in ["\r", "\n", "\t", "\\", "%"]:
+                if self.cur_char in ["\r", "\n", "\t", "\\", "%"]:
                     self.abort("Illegal character in string")
-                self.nextChar()
+                self.next_char()
 
-            tokenText = self.source[startPos:self.curPos] # Get the substring
+            tokenText = self.source[startPos:self.cur_pos] # Get the substring
             token = Token(tokenText, TokenType.STRING)
-        elif self.curChar == "=":
+        elif self.cur_char == "=":
             # Check whether the token is = or ==
             if self.peek() == "=":
-                lastChar = self.curChar
-                self.nextChar()
-                token = Token(lastChar + self.curChar, TokenType.EQEQ)
+                lastChar = self.cur_char
+                self.next_char()
+                token = Token(lastChar + self.cur_char, TokenType.EQEQ)
             else:
-                token = Token(self.curChar, TokenType.EQ)
-        elif self.curChar == ">":
+                token = Token(self.cur_char, TokenType.EQ)
+        elif self.cur_char == ">":
             # Check whether the token is > or >=
             if self.peek() == "=":
-                lastChar = self.curChar
-                self.nextChar()
-                token = Token(lastChar + self.curChar, TokenType.GTEQ)
+                lastChar = self.cur_char
+                self.next_char()
+                token = Token(lastChar + self.cur_char, TokenType.GTEQ)
             else:
-                token = Token(self.curChar, TokenType.GTHAN)
-        elif self.curChar == "<":
+                token = Token(self.cur_char, TokenType.GTHAN)
+        elif self.cur_char == "<":
             # Check whether the token is < or <=
             if self.peek() == "=":
-                lastChar = self.curChar
-                self.nextChar()
-                token = Token(lastChar + self.curChar, TokenType.LTEQ)
+                lastChar = self.cur_char
+                self.next_char()
+                token = Token(lastChar + self.cur_char, TokenType.LTEQ)
             else:
-                token = Token(self.curChar, TokenType.LTHAN)
-        elif self.curChar == "!":
+                token = Token(self.cur_char, TokenType.LTHAN)
+        elif self.cur_char == "!":
             # Check whether the token is ! or !=
             # If the token is !, return an error
             if self.peek() == "=":
-                lastChar = self.curChar
-                self.nextChar()
-                token = Token(lastChar + self.curChar, TokenType.NOTEQ)
+                lastChar = self.cur_char
+                self.next_char()
+                token = Token(lastChar + self.cur_char, TokenType.NOTEQ)
             else:
                 self.abort(f"!= expected, got !{self.peek()}")
         
-        elif self.curChar == "\n":
-            token = Token(self.curChar, TokenType.NEWLINE)
-        elif self.curChar == "\0":
-            token = Token(self.curChar, TokenType.EOF)
+        elif self.cur_char == "\n":
+            token = Token(self.cur_char, TokenType.NEWLINE)
+        elif self.cur_char == "\0":
+            token = Token(self.cur_char, TokenType.EOF)
 
-        elif self.curChar.isdigit():
+        elif self.cur_char.isdigit():
             # Leading character is a digit, so it should be a number
             # Check the consecutive digits and check if there is a decimal
-            startPos = self.curPos
+            startPos = self.cur_pos
             while self.peek().isdigit():
-                self.nextChar()
+                self.next_char()
             if self.peek() == ".": # Its a decimal
-                self.nextChar()
+                self.next_char()
 
                 # There must be at least another digit after the decimal
                 if not self.peek().isdigit():
                     # Error found!
                     self.abort("Illegal character in number")
                 while self.peek().isdigit():
-                    self.nextChar()
-            tokenText = self.source[startPos:self.curPos + 1]
+                    self.next_char()
+            tokenText = self.source[startPos:self.cur_pos + 1]
             token = Token(tokenText, TokenType.NUMBER)
-        elif self.curChar.isalpha():
+        elif self.cur_char.isalpha():
             # Leading character is a letter, so it should be a string
             # Get consecutive alpha-numeric characters
-            startPos = self.curPos
+            startPos = self.cur_pos
             while self.peek().isalpha():
-                self.nextChar()
-            tokenText = self.source[startPos:self.curPos + 1] # Get substring
+                self.next_char()
+            tokenText = self.source[startPos:self.cur_pos + 1] # Get substring
             keyword = Token.checkIfKeyword(tokenText) # Check if there are any keywords within the string
             if keyword == None:
                 token = Token(tokenText, TokenType.IDENT)
@@ -152,7 +155,7 @@ class Lexer():
                 token = Token(tokenText, keyword)
 
         else:
-            self.abort(f"Unknown token found: {self.curChar}")
+            self.abort(f"Unknown token found: {self.cur_char}")
 
-        self.nextChar()
+        self.next_char()
         return token

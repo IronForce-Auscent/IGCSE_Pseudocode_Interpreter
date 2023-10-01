@@ -5,10 +5,9 @@ def main():
     source = "IF+-123 foo*THEN/"
     lexer = Lexer(source)
 
-    token = lexer.getToken()
+    token = lexer.get_token()
     while token.kind != TokenType.EOF:
         print(token.kind)
-        token = lexer.getToken()
+        token = lexer.get_token()
 
-if __name__ == "__main__":
-    main()
+main()
