@@ -1,7 +1,67 @@
-2023-10-01 18:58:32,350 interpreter.parser-INFO:PROGRAM
-2023-10-01 18:58:32,350 interpreter.parser-INFO:STATEMENT-LABEL
-2023-10-01 18:58:32,350 interpreter.parser-INFO:NEWLINE
-2023-10-01 18:58:32,350 interpreter.parser-INFO:STATEMENT-OUTPUT
-2023-10-01 18:58:32,350 interpreter.parser-INFO:NEWLINE
-2023-10-01 18:58:32,350 interpreter.parser-INFO:STATEMENT-GOTO
-2023-10-01 18:58:32,350 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,826 interpreter.parser-INFO:PROGRAM
+2023-10-08 22:22:27,826 interpreter.parser-INFO:STATEMENT-OUTPUT
+2023-10-08 22:22:27,826 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,826 interpreter.parser-INFO:STATEMENT-INPUT
+2023-10-08 22:22:27,826 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,834 interpreter.parser-INFO:STATEMENT-OUTPUT
+2023-10-08 22:22:27,834 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,834 interpreter.parser-INFO:STATEMENT-LET
+2023-10-08 22:22:27,834 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,834 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,834 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,834 interpreter.parser-INFO:PRIMARY: 0
+2023-10-08 22:22:27,834 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,834 interpreter.parser-INFO:STATEMENT-LET
+2023-10-08 22:22:27,834 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,839 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,839 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,839 interpreter.parser-INFO:PRIMARY: 1
+2023-10-08 22:22:27,839 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,839 interpreter.parser-INFO:STATEMENT-WHILE
+2023-10-08 22:22:27,839 interpreter.parser-INFO:COMPARISON
+2023-10-08 22:22:27,842 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,842 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,842 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,842 interpreter.parser-INFO:PRIMARY: nums
+2023-10-08 22:22:27,842 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,842 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,845 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,845 interpreter.parser-INFO:PRIMARY: 0
+2023-10-08 22:22:27,845 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,845 interpreter.parser-INFO:STATEMENT-OUTPUT
+2023-10-08 22:22:27,845 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,845 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,845 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,845 interpreter.parser-INFO:PRIMARY: a
+2023-10-08 22:22:27,845 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,850 interpreter.parser-INFO:STATEMENT-LET
+2023-10-08 22:22:27,852 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,852 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,853 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,854 interpreter.parser-INFO:PRIMARY: a
+2023-10-08 22:22:27,854 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,855 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,855 interpreter.parser-INFO:PRIMARY: b
+2023-10-08 22:22:27,855 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,855 interpreter.parser-INFO:STATEMENT-LET
+2023-10-08 22:22:27,858 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,858 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,858 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,858 interpreter.parser-INFO:PRIMARY: b
+2023-10-08 22:22:27,858 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,858 interpreter.parser-INFO:STATEMENT-LET
+2023-10-08 22:22:27,858 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,858 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,858 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,858 interpreter.parser-INFO:PRIMARY: c
+2023-10-08 22:22:27,858 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,858 interpreter.parser-INFO:STATEMENT-LET
+2023-10-08 22:22:27,866 interpreter.parser-INFO:EXPRESSION
+2023-10-08 22:22:27,866 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,866 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,866 interpreter.parser-INFO:PRIMARY: nums
+2023-10-08 22:22:27,866 interpreter.parser-INFO:TERM
+2023-10-08 22:22:27,866 interpreter.parser-INFO:FACTOR
+2023-10-08 22:22:27,866 interpreter.parser-INFO:PRIMARY: 1
+2023-10-08 22:22:27,866 interpreter.parser-INFO:NEWLINE
+2023-10-08 22:22:27,866 interpreter.parser-INFO:NEWLINE

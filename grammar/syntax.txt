@@ -13,7 +13,7 @@
 <expr> ::= <term> {("-" | "+") <term>}
 <term> ::= <factor> {("/" | "*") <factor>}
 <factor> ::= ["+" | "-"] <primary>
-<primary> ::= <number> | <string>
+<primary> ::= <number> | <ident>
 
 
 <nl> ::= '\n'+

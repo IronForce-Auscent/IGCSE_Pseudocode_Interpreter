@@ -11,6 +11,10 @@ class Parser():
         self.lexer = lexer # Initialize the lexer
         self.logger = logging.getLogger(__name__)
 
+        self.symbols = set()  # Stores a list of variables initialized so far
+        self.labels_declared = set()   # Stores a list of labels declared so far
+        self.labels_gotoed = set()    # Stores a list of labels we have goto'd so far   
+
         self.cur_token = None
         self.peek_token = None
         self.next_token()
@@ -53,6 +57,15 @@ class Parser():
         if not self.check_token(kind):
             self.abort(f"Expected {kind.name}, got {self.cur_token.kind.name} instead")
         self.next_token()
+        
+    def is_comparison_operator(self):
+        """
+        Checks if the current token is a comparison operator ("==", ">=", ">", "<=", "<", "!=")
+
+        Returns:
+        _ (bool): The current token is a comparison operator
+        """
+        return self.check_token(TokenType.GTHAN) or self.check_token(TokenType.GTEQ) or self.check_token(TokenType.LTHAN) or self.check_token(TokenType.LTEQ) or self.check_token(TokenType.EQEQ) or self.check_token(TokenType.NOTEQ)
 
     def next_token(self):
         """
@@ -82,6 +95,10 @@ class Parser():
         while not self.check_token(TokenType.EOF):
             self.statement()
 
+        for label in self.labels_gotoed:
+            if label not in self.labels_declared:
+                self.abort(f"Attempting to GOTO undefined label: {label}")
+
     def statement(self):
         """
         Processes the grammar rule "<stmt> ::= (...)
@@ -100,12 +117,13 @@ class Parser():
             else:
                 # If it is not a string, then it should be an expression
                 self.expression()
+
         # Statement: "IF" <condi> "THEN" nl {<expr>} nl "ENDIF"
         elif self.check_token(TokenType.IF):
             self.logger.info("STATEMENT-IF")
             self.next_token()
             self.comparison()
-            self.match(TokenType.THEN) # Checks for end of comparison
+            self.match(TokenType.THEN)  # Checks for end of comparison
             self.newline()
 
             # Check for zero or more statements in body
@@ -132,12 +150,22 @@ class Parser():
         elif self.check_token(TokenType.INPUT):
             self.logger.info("STATEMENT-INPUT")
             self.next_token()
+
+            if self.cur_token.text not in self.symbols:
+                # Check if the variable has already been defined. If not, define it
+                self.symbols.add(self.cur_token.text)
+
             self.match(TokenType.IDENT)
         
         # Statement: "LET" <ident> "=" <expr | string | bool>
         elif self.check_token(TokenType.LET):
             self.logger.info("STATEMENT-LET")
             self.next_token()
+
+            if self.cur_token.text not in self.symbols:
+                # Check if the variable has already been defined. If not, define it
+                self.symbols.add(self.cur_token.text)
+
             self.match(TokenType.IDENT)
             self.match(TokenType.EQ)
             """
@@ -155,12 +183,20 @@ class Parser():
         elif self.check_token(TokenType.GOTO):
             self.logger.info("STATEMENT-GOTO")
             self.next_token()
+
+            self.labels_gotoed.add(self.cur_token.text)  # Adds the current label to the list
             self.match(TokenType.IDENT)
         
         # Statement: "LABEL" <ident>
         elif self.check_token(TokenType.LABEL):
             self.logger.info("STATEMENT-LABEL")
             self.next_token()
+
+            if self.cur_token.text in self.labels_declared:
+                # Looks like this label has already been declared, lets give the user an error
+                self.abort(f"Label already exists: {self.cur_token.text}")
+
+            self.labels_declared.add(self.cur_token.text)
             self.match(TokenType.IDENT)
 
         
@@ -180,5 +216,75 @@ class Parser():
         # Requires at least one newline
         self.match(TokenType.NEWLINE)
         # But we do accept multiple newlines, so let's check for them too
-        while self.check_peek(TokenType.NEWLINE):
+        while self.check_token(TokenType.NEWLINE):
             self.next_token()
+
+    def comparison(self):
+        """
+        Processes the grammar rule "<condi> ::= <expr> ("==" | ">" | ">=" | "<" | "<=" | "!=") <expr>"
+        """
+        self.logger.info("COMPARISON")
+
+        self.expression()
+        # Statement must contain at least one comparison operator and another expression
+        if self.is_comparison_operator():
+            self.next_token()
+            self.expression()
+        else:
+            self.abort(f"Expected expression operator at: {self.cur_token.text}")
+        
+        # We can allow 0 or more comparison operators and expressions afterwards
+        while self.is_comparison_operator():
+            self.next_token()
+            self.expression()
+    
+    def expression(self):
+        """
+        Processes the grammar rule "<expr> ::= <term> {("-" | "+") <term>}"
+        """
+        self.logger.info("EXPRESSION")
+
+        self.term()
+        # We can have 0 or more +/- operators and terms
+        while self.check_token(TokenType.PLUS) or self.check_token(TokenType.MINUS):
+            self.next_token()
+            self.term()
+    
+    def term(self):
+        """
+        Processes the grammar rule "<term> ::= <factor> {("/" | "*") <factor>}"
+        """
+        self.logger.info("TERM")
+
+        self.factor()
+        # We can have 0 or more //* operators and factors
+        while self.check_token(TokenType.SLASH) or self.check_token(TokenType.ASTERISK):
+            self.next_token()
+            self.factor()
+    
+    def factor(self):
+        """
+        Processes the grammar rule "<factor> ::= ["+" | "-"] <primary>"
+        """
+        self.logger.info("FACTOR")
+
+        if self.check_token(TokenType.PLUS) or self.check_token(TokenType.MINUS):
+            self.next_token()
+        self.primary()
+
+    def primary(self):
+        """
+        Processes the grammar rule "<primary> ::= <number> | <ident>"
+        """
+        self.logger.info(f"PRIMARY: {self.cur_token.text}")
+
+        if self.check_token(TokenType.NUMBER):
+            self.next_token()
+        elif self.check_token(TokenType.IDENT):
+            # Ensure that the variable already exists
+            if self.cur_token.text not in self.symbols:
+                self.abort(f"Attempting to reference variable before assignment: {self.cur_token.text}")
+            self.next_token()
+        else:
+            # Invalid assigned value, throw an error
+            self.abort(f"Unexpected token at: {self.cur_token.text}")

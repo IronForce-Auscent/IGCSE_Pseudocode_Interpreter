@@ -1,3 +1,13 @@
-LABEL loop
-OUTPUT "hello, world!"
-GOTO loop
+OUTPUT "How many fibonacci numbers do you want?"
+INPUT nums
+OUTPUT ""
+
+LET a = 0
+LET b = 1
+WHILE nums > 0 DO
+    OUTPUT a
+    LET c = a + b
+    LET a = b
+    LET b = c
+    LET nums = nums - 1
+ENDWHILE
