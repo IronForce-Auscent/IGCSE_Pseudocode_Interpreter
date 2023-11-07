@@ -25,23 +25,19 @@ class Parser():
         """
         Returns if the token provided is valid
 
-        Arguments:
-        kind (TokenType): The token type of the current token
+        :param kind: The token type of the current token (TokenType)
 
-        Returns:
-        _ (bool): Whether the provided kind matches the token kind of the current token
+        :return: Whether the provided kind matches the token kind of the current token (bool)
         """
-        return kind == self.cur_token.kind
+        return kind == self.cur_token.type
 
     def check_peek(self, kind: TokenType):
         """
         Returns if the next token provided is valid
         
-        Arguments:
-        kind (TokenType): The token type of the current token
+        :param kind: The token type of the current token (TokenType)
 
-        Returns:
-        _ (bool): Whether the provided kind matches the token kind of the next token
+        :return: Whether the provided kind matches the token kind of the next token (bool)
         """
         return kind == self.peek_token.kind
 
@@ -51,19 +47,17 @@ class Parser():
         If it doesn't match, return an error
         Advance the current token
 
-        Arguments:
-        kind (TokenType): The token type of the current token
+        :param kind: The token type of the current token (TokenType)
         """
         if not self.check_token(kind):
-            self.abort(f"Expected {kind.name}, got {self.cur_token.kind.name} instead")
+            self.abort(f"Expected {kind.name}, got {self.cur_token.type.name} instead")
         self.next_token()
         
     def is_comparison_operator(self):
         """
         Checks if the current token is a comparison operator ("==", ">=", ">", "<=", "<", "!=")
 
-        Returns:
-        _ (bool): The current token is a comparison operator
+        :return: Whether the current token is a comparison operator or not (bool)
         """
         return self.check_token(TokenType.GTHAN) or self.check_token(TokenType.GTEQ) or self.check_token(TokenType.LTHAN) or self.check_token(TokenType.LTEQ) or self.check_token(TokenType.EQEQ) or self.check_token(TokenType.NOTEQ)
 
@@ -151,9 +145,9 @@ class Parser():
             self.logger.info("STATEMENT-INPUT")
             self.next_token()
 
-            if self.cur_token.text not in self.symbols:
+            if self.cur_token.value not in self.symbols:
                 # Check if the variable has already been defined. If not, define it
-                self.symbols.add(self.cur_token.text)
+                self.symbols.add(self.cur_token.value)
 
             self.match(TokenType.IDENT)
         
@@ -162,9 +156,9 @@ class Parser():
             self.logger.info("STATEMENT-LET")
             self.next_token()
 
-            if self.cur_token.text not in self.symbols:
+            if self.cur_token.value not in self.symbols:
                 # Check if the variable has already been defined. If not, define it
-                self.symbols.add(self.cur_token.text)
+                self.symbols.add(self.cur_token.value)
 
             self.match(TokenType.IDENT)
             self.match(TokenType.EQ)
@@ -184,7 +178,7 @@ class Parser():
             self.logger.info("STATEMENT-GOTO")
             self.next_token()
 
-            self.labels_gotoed.add(self.cur_token.text)  # Adds the current label to the list
+            self.labels_gotoed.add(self.cur_token.value)  # Adds the current label to the list
             self.match(TokenType.IDENT)
         
         # Statement: "LABEL" <ident>
@@ -192,17 +186,17 @@ class Parser():
             self.logger.info("STATEMENT-LABEL")
             self.next_token()
 
-            if self.cur_token.text in self.labels_declared:
+            if self.cur_token.value in self.labels_declared:
                 # Looks like this label has already been declared, lets give the user an error
-                self.abort(f"Label already exists: {self.cur_token.text}")
+                self.abort(f"Label already exists: {self.cur_token.value}")
 
-            self.labels_declared.add(self.cur_token.text)
+            self.labels_declared.add(self.cur_token.value)
             self.match(TokenType.IDENT)
 
         
         # Not a valid expression, throw an error!
         else:
-            self.abort(f"Invalid statement at {self.cur_token.text} ({self.cur_token.kind.name})")
+            self.abort(f"Invalid statement at {self.cur_token.value} ({self.cur_token.type.name})")
 
         self.newline()
 
@@ -231,7 +225,7 @@ class Parser():
             self.next_token()
             self.expression()
         else:
-            self.abort(f"Expected expression operator at: {self.cur_token.text}")
+            self.abort(f"Expected expression operator at: {self.cur_token.value}")
         
         # We can allow 0 or more comparison operators and expressions afterwards
         while self.is_comparison_operator():
@@ -276,15 +270,15 @@ class Parser():
         """
         Processes the grammar rule "<primary> ::= <number> | <ident>"
         """
-        self.logger.info(f"PRIMARY: {self.cur_token.text}")
+        self.logger.info(f"PRIMARY: {self.cur_token.value}")
 
         if self.check_token(TokenType.NUMBER):
             self.next_token()
         elif self.check_token(TokenType.IDENT):
             # Ensure that the variable already exists
-            if self.cur_token.text not in self.symbols:
-                self.abort(f"Attempting to reference variable before assignment: {self.cur_token.text}")
+            if self.cur_token.value not in self.symbols:
+                self.abort(f"Attempting to reference variable before assignment: {self.cur_token.value}")
             self.next_token()
         else:
             # Invalid assigned value, throw an error
-            self.abort(f"Unexpected token at: {self.cur_token.text}")
+            self.abort(f"Unexpected token at: {self.cur_token.value}")

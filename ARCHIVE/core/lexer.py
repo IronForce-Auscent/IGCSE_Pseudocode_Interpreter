@@ -4,13 +4,13 @@ import logging
 
 class Lexer():
     def __init__(self, source):
-        self.source = source + '\n'
+        self.source = source
         self.logger = logging.getLogger(__name__)
         self.cur_char = "" # The current character that the lexer is scanning
         self.cur_pos = -1 # The current position in the code that the lexer is scanning
-        self.next_char()
+        self.get_next_character()
     
-    def next_char(self):
+    def get_next_character(self):
         """
         Processes the next character in the code
         """
@@ -28,12 +28,12 @@ class Lexer():
             return "\0"
         return self.source[self.cur_pos + 1]
 
-    def abort(self, message: str):
+    def raise_exception(self, message: str):
         """
-        Exits compiler with an error message if an invalid token is found
+        Throws a custom exception
 
-        Arguments:
-        message (str): The error message to output
+        :param error_msg: The error message to be thrown (str)
+        :return: N/A
         """
         self.logger.error(f"Lexing error: {message}")
         sys.exit("Lexing error, please check the generated logs for more information")
@@ -45,7 +45,7 @@ class Lexer():
         Newline characters are used to indicate end of statement
         """
         while self.cur_char == ' ' or self.cur_char == "\t" or self.cur_char == "\r":
-            self.next_char()
+            self.get_next_character()
 
     def skip_comment(self):
         """
@@ -53,9 +53,9 @@ class Lexer():
         """
         if self.cur_char == "/" and self.peek() == "/":
             while self.cur_char != "\n":
-                self.next_char()
+                self.get_next_character()
 
-    def get_token(self) -> Token:
+    def get_next_token(self) -> Token:
         """
         Classifies and returns the next token
         """
@@ -73,15 +73,15 @@ class Lexer():
             token = Token(self.cur_char, TokenType.SLASH)
         elif self.cur_char == "\"":
             # Get the characters between the double quotations
-            self.next_char()
+            self.get_next_character()
             startPos = self.cur_pos
 
             while self.cur_char != "\"":
                 # Restrict all special characters (eg escape, newline, tabs, %)
                 # Makes it easier to compile to C later on
                 if self.cur_char in ["\r", "\n", "\t", "\\", "%"]:
-                    self.abort("Illegal character in string")
-                self.next_char()
+                    self.raise_exception("Illegal character in string")
+                self.get_next_character()
 
             tokenText = self.source[startPos:self.cur_pos] # Get the substring
             token = Token(tokenText, TokenType.STRING)
@@ -89,7 +89,7 @@ class Lexer():
             # Check whether the token is = or ==
             if self.peek() == "=":
                 lastChar = self.cur_char
-                self.next_char()
+                self.get_next_character()
                 token = Token(lastChar + self.cur_char, TokenType.EQEQ)
             else:
                 token = Token(self.cur_char, TokenType.EQ)
@@ -97,7 +97,7 @@ class Lexer():
             # Check whether the token is > or >=
             if self.peek() == "=":
                 lastChar = self.cur_char
-                self.next_char()
+                self.get_next_character()
                 token = Token(lastChar + self.cur_char, TokenType.GTEQ)
             else:
                 token = Token(self.cur_char, TokenType.GTHAN)
@@ -105,7 +105,7 @@ class Lexer():
             # Check whether the token is < or <=
             if self.peek() == "=":
                 lastChar = self.cur_char
-                self.next_char()
+                self.get_next_character()
                 token = Token(lastChar + self.cur_char, TokenType.LTEQ)
             else:
                 token = Token(self.cur_char, TokenType.LTHAN)
@@ -114,10 +114,10 @@ class Lexer():
             # If the token is !, return an error
             if self.peek() == "=":
                 lastChar = self.cur_char
-                self.next_char()
+                self.get_next_character()
                 token = Token(lastChar + self.cur_char, TokenType.NOTEQ)
             else:
-                self.abort(f"!= expected, got !{self.peek()}")
+                self.raise_exception(f"!= expected, got !{self.peek()}")
         
         elif self.cur_char == "\n":
             token = Token(self.cur_char, TokenType.NEWLINE)
@@ -129,16 +129,16 @@ class Lexer():
             # Check the consecutive digits and check if there is a decimal
             startPos = self.cur_pos
             while self.peek().isdigit():
-                self.next_char()
+                self.get_next_character()
             if self.peek() == ".": # Its a decimal
-                self.next_char()
+                self.get_next_character()
 
                 # There must be at least another digit after the decimal
                 if not self.peek().isdigit():
                     # Error found!
-                    self.abort("Illegal character in number")
+                    self.raise_exception("Illegal character in number")
                 while self.peek().isdigit():
-                    self.next_char()
+                    self.get_next_character()
             tokenText = self.source[startPos:self.cur_pos + 1]
             token = Token(tokenText, TokenType.NUMBER)
         elif self.cur_char.isalpha():
@@ -146,7 +146,7 @@ class Lexer():
             # Get consecutive alpha-numeric characters
             startPos = self.cur_pos
             while self.peek().isalpha():
-                self.next_char()
+                self.get_next_character()
             tokenText = self.source[startPos:self.cur_pos + 1] # Get substring
             keyword = Token.checkIfKeyword(tokenText) # Check if there are any keywords within the string
             if keyword == None:
@@ -155,7 +155,7 @@ class Lexer():
                 token = Token(tokenText, keyword)
 
         else:
-            self.abort(f"Unknown token found: {self.cur_char}")
+            self.raise_exception(f"Unknown token found: {self.cur_char}")
 
-        self.next_char()
+        self.get_next_character()
         return token

@@ -1,6 +1,6 @@
-from interpreter.lexer import Lexer
-from interpreter.token import TokenType
-from interpreter.parser import Parser
+from core.lexer import Lexer
+from core.token import TokenType
+from core.parser import Parser
 import sys
 
 def main():

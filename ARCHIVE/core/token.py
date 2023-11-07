@@ -46,9 +46,9 @@ class TokenType(enum.Enum):
 
 
 class Token:
-    def __init__(self, token_text: str, token_kind: TokenType):
-        self.text = token_text
-        self.kind = token_kind
+    def __init__(self, token_value: str, token_type: TokenType):
+        self.value = token_value
+        self.type = token_type
     
     @staticmethod
     def checkIfKeyword(token_text: str) -> TokenType | None:
@@ -56,3 +56,14 @@ class Token:
             if kind.name == token_text and kind.value > 100 and kind.value < 300:
                 return kind
         return None
+    
+    def __str__(self):
+        """
+        Returns the string representation of the class instance
+
+        :return: Token(self.type, self.value)
+        """
+        return f"Token({self.type}, {self.value})"
+    
+    def __repr__(self):
+        return self.__str__()

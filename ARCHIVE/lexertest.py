@@ -1,5 +1,5 @@
-from interpreter.lexer import Lexer
-from interpreter.token import TokenType
+from core.lexer import Lexer
+from core.token import TokenType
 
 def main():
     source = "IF+-123 foo*THEN/"
