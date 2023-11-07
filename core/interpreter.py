@@ -11,6 +11,14 @@ class Interpreter(object):
         self.source: str = source 
         self.pos: int = 0
         self.cur_token: any = None
+        self.cur_char = source[self.pos]
+        
+        self.allowed_operators = (
+            TokenType.PLUS, 
+            TokenType.MINUS,
+            TokenType.ASTERISK, 
+            TokenType.SLASH
+        )
     
     def raise_exception(self, error_msg: str):
         """
@@ -21,32 +29,72 @@ class Interpreter(object):
         """
         self.logger.error(f"Interpreter error: {error_msg}")
         sys.exit("Exception thrown. Please reference interpreter logs for details")
+
+    #######################################################################
+    #                                                                     #
+    #                   Lexical Analyzer logic                            #
+    #                                                                     #
+    #######################################################################
+
+    def skip_whitespaces(self):
+        while self.cur_char is not None and self.cur_char.isspace():
+            self.advance()
     
+    def advance(self):
+        self.pos += 1
+        if self.pos > len(self.source) - 1:
+            self.cur_char = None
+            self.logger.info("Reached end of source code")
+        else:
+            self.cur_char = self.source[self.pos]
+
+    def integer(self):
+        """
+        Returns a multidigit integer consumed from the input
+
+        :return: integer
+        """
+        result = ""
+        while self.cur_char is not None and self.cur_char.isdigit():
+            result += self.cur_char
+            self.advance()
+        return int(result)
+
     def get_next_token(self):
         """
         Lexical analyzer of the interpreter. Analyzes and breaks down source code into tokens
 
         :return: The token form of the source code (Token)
         """
-
-        source = self.source
-        if self.pos > len(source) - 1:
-            return Token(TokenType.EOF, None)
-        current_char = source[self.pos]
-        while current_char in (" ", "\t", "\r"):
-            self.pos += 1
-            return self.get_next_token()
-
-        if current_char.isdigit():
-            token = Token(TokenType.INTEGER, int(current_char))
-        elif current_char == "+":
-            token = Token(TokenType.PLUS, current_char)
-        elif current_char == "-":
-            token = Token(TokenType.MINUS, current_char)
-        else:
-            self.raise_exception(f"Unidentified character found: {current_char}")
-        self.pos += 1
-        return token
+        while self.cur_char is not None:
+            if self.cur_char.isspace():
+                self.skip_whitespaces()
+                continue
+    
+            if self.cur_char.isnumeric():
+                token = Token(TokenType.INTEGER, self.integer())
+            elif self.cur_char == "+":
+                token = Token(TokenType.PLUS, self.cur_char)
+                self.advance()
+            elif self.cur_char == "-":
+                token = Token(TokenType.MINUS, self.cur_char)
+                self.advance()
+            elif self.cur_char == "*":
+                token = Token(TokenType.ASTERISK, self.cur_char)
+                self.advance()
+            elif self.cur_char == "/":
+                token = Token(TokenType.SLASH, self.cur_char)
+                self.advance()
+            else:
+                self.raise_exception(f"1 Unidentified character found: {self.cur_char}")
+            return token
+        return Token(TokenType.EOF, None)
+    
+    #######################################################################
+    #                                                                     #
+    #                   Parser/Component logic                            #
+    #                                                                     #
+    #######################################################################
     
     def eat(self, token_type: TokenType):
         """
@@ -58,28 +106,41 @@ class Interpreter(object):
         else:
             self.raise_exception("Tokens do not match")
 
+    def term(self):
+        """
+        Parses and returns a token value of token type INTEGER
+
+        :return: Token value (int)
+        """
+        token = self.cur_token
+        self.eat(TokenType.INTEGER)
+        return token.value
+
     def expr(self):
         """
         Parses an expression statement
         """
-        result = None
 
         # Simple expression parsing for x + y
         self.cur_token = self.get_next_token()
-        left = self.cur_token
-        self.eat(TokenType.INTEGER)
-
-        operator = self.cur_token # Expects a "+" operator
-        if operator.value == "+":
-            self.eat(TokenType.PLUS)
-            right = self.cur_token
-            self.eat(TokenType.INTEGER)
-            result = left.value + right.value
-        elif operator.value == "-":
-            self.eat(TokenType.MINUS)
-            right = self.cur_token
-            self.eat(TokenType.INTEGER)
-            result = left.value - right.value
+        result = self.term()
+        while self.cur_token.type in self.allowed_operators:
+            token = self.cur_token
+            if token.type == TokenType.PLUS:
+                self.eat(TokenType.PLUS)
+                result += self.term()
+            elif token.type == TokenType.MINUS:
+                self.eat(TokenType.MINUS)
+                result -= self.term()
+            elif token.type == TokenType.ASTERISK:
+                self.eat(TokenType.ASTERISK)
+                result *= self.term()
+            elif token.type == TokenType.SLASH:
+                self.eat(TokenType.SLASH)
+                result /= self.term()
+            else:
+                pass # Placeholder
         else:
-            self.raise_exception(f"Unidentified character found: {operator}")
+            if self.cur_token.type != TokenType.EOF:
+                self.raise_exception(f"Unexpected expression: {self.cur_token.value}")
         return result

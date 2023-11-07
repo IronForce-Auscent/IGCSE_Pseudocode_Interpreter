@@ -54,7 +54,7 @@ class Token(object):
 
         :return: Token(self.type, self.value)
         """
-        return f"Token({self.type}, {self.value})"
+        return f"Token({self.type}, {repr(self.value)})"
     
     def __repr__(self):
         return self.__str__()
