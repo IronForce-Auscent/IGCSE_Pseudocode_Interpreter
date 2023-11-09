@@ -12,7 +12,7 @@
 <comment> ::= "//" <string>+
 <expr> ::= <term> {("-" | "+") <term>}
 <term> ::= <factor> {("/" | "*") <factor>}
-<factor> ::= <int> | <LPAREN> <expr> <RPAREN>
+<factor> ::= [("-" | "+")] <factor> | <int> | <LPAREN> <expr> <RPAREN>
 
 
 <nl> ::= '\n'+

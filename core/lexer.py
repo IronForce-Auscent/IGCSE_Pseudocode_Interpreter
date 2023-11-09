@@ -3,6 +3,12 @@ from .exception import ExceptionHandler
 import logging
 
 class Lexer(object):
+    """
+    Lexical analyzer ("Lexer") class to convert raw source code into tokens
+
+    :param source: Source code written in pseudocode, according to the syntax defined in the BNF syntax document
+    :type source: str
+    """
     def __init__(self, source: str):
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ExceptionHandler: ExceptionHandler = ExceptionHandler(__name__)
@@ -11,10 +17,16 @@ class Lexer(object):
         self.cur_char: str | int | any = self.source[self.pos]
 
     def skip_whitespaces(self):
+        """
+        Skips whitespaces and tabs in the code
+        """
         while self.cur_char is not None and self.cur_char.isspace():
             self.advance()
     
     def advance(self):
+        """
+        Advances to the next character in the code
+        """
         self.pos += 1
         if self.pos > len(self.source) - 1:
             self.cur_char = None
