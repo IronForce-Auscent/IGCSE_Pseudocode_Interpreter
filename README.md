@@ -1,6 +1,6 @@
 ## What is this?
 
-A simple compiler made in Python, designed to compile IGCSE pseudocode to C code
+A simple interpreter made in Python, designed to execute IGCSE pseudocode on the fly
 
 ## But why?
 I don't know, really. I just got bored one day and decided, yeah I'll push my skills to the max and build a somewhat-usable compiler I guess
