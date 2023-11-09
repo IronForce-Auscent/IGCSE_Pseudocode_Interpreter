@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # Create a handler that will save logs to a file
-logger_handler = logging.FileHandler(filename="interpreter.log", mode="w", encoding="utf-8")
+logger_handler = logging.FileHandler(filename="core.log", mode="w", encoding="utf-8")
 logger_handler.setLevel(logging.DEBUG)
 
 # Create a formatter for saved logs and add it to the handler

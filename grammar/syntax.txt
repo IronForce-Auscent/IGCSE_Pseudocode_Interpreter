@@ -12,13 +12,9 @@
 <comment> ::= "//" <string>+
 <expr> ::= <term> {("-" | "+") <term>}
 <term> ::= <factor> {("/" | "*") <factor>}
-<factor> ::= ["+" | "-"] <primary>
-<primary> ::= <number> | <ident>
+<factor> ::= <int> | <LPAREN> <expr> <RPAREN>
 
 
 <nl> ::= '\n'+
-<number> ::= <int_lit> | <real_lit>
-<real_lit> ::= <int_lit>"."<int_lit>
-<string> ::= [A-Za-z]+
-<int_lit> ::= [0-9]+
-<bool> ::= "TRUE" | "FALSE"
+<LPAREN> ::= '('
+<RPAREN> ::= ')"

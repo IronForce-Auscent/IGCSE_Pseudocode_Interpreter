@@ -1,6 +1,8 @@
-from core.interpreter import Interpreter
+from core.parser import Parser
+from core.lexer import Lexer
 
-source = "5 * 5 - 5 / 5 + 5 / 5"
-interpreter = Interpreter(source)
-result = interpreter.expr()
+source = "IF 5 * ((1 + (1 + 1)) + (1 + 1))"
+lexer = Lexer(source)
+parser = Parser(lexer)
+result = parser.expr()
 print(result)

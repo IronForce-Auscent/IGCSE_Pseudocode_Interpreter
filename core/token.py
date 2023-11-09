@@ -33,20 +33,22 @@ class TokenType(enum.Enum):
     EQ = "EQ"
     PLUS = "PLUS"
     MINUS = "MINUS"
-    ASTERISK = "ASTERISK"
-    SLASH = "SLASH"
+    MUL = "MUL"
+    DIV = "DIV"
     EQEQ = "EQEQ"
     NOTEQ = "NOTEQ"
     GTEQ = "GTEQ"
     GTHAN = "GTHAN"
     LTEQ = "LTEQ"
     LTHAN = "LTHAN"
+    LPAREN = "LPAREN"
+    RPAREN = "RPAREN"
 
 
 class Token(object):
     def __init__(self, token_type: TokenType, token_value: any):        
-        self.type = token_type
-        self.value = token_value
+        self.type: TokenType = token_type
+        self.value: any = token_value
     
     def __str__(self):
         """
