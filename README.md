@@ -2,6 +2,8 @@
 
 A simple interpreter made in Python, designed to execute IGCSE pseudocode on the fly
 
+Credits: https://ruslanspivak.com/lsbasi-part1/
+
 ## But why?
 I don't know, really. I just got bored one day and decided, yeah I'll push my skills to the max and build a somewhat-usable compiler I guess
 
