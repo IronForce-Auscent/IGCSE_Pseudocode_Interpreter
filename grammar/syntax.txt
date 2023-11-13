@@ -1,20 +1,26 @@
-<prgm> ::= <stmt>
+    program : compound_statement DOT
 
-<stmt> ::= "IF" <condi> "THEN" nl {<expr>} nl "ENDIF"
-| "WHILE" <condi> "DO" nl {<expr>} nl "ENDWHILE"
-| "INPUT" <ident>
-| "OUTPUT" <expr | string>
-| "LET" <ident> "=" <expr | string | bool> 
-| ("INCR" | "DECR") <ident> (<expr>)?
-| "FOR" <ident> "=" <expr> "TO" <expr> nl {<expr>} nl "NEXT" <ident>
+    compound_statement : BEGIN statement_list END
 
-<condi> ::= <expr> ("==" | ">" | ">=" | "<" | "<=" | "!=") <expr>
-<comment> ::= "//" <string>+
-<expr> ::= <term> {("-" | "+") <term>}
-<term> ::= <factor> {("/" | "*") <factor>}
-<factor> ::= [("-" | "+")] <factor> | <int> | <LPAREN> <expr> <RPAREN>
+    statement_list : statement
+                   | statement SEMI statement_list
 
+    statement : compound_statement
+              | assignment_statement
+              | empty
 
-<nl> ::= '\n'+
-<LPAREN> ::= '('
-<RPAREN> ::= ')"
+    assignment_statement : variable ASSIGN expr
+
+    empty :
+
+    expr: term ((PLUS | MINUS) term)*
+
+    term: factor ((MUL | DIV) factor)*
+
+    factor : PLUS factor
+           | MINUS factor
+           | INTEGER
+           | LPAREN expr RPAREN
+           | variable
+
+    variable: ID

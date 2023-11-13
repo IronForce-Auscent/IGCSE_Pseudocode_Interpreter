@@ -2,9 +2,14 @@ from core.parser import Parser
 from core.lexer import Lexer
 from core.interpreter import Interpreter
 
-source = "5 - - - 2"
+source = """
+START
+    LET x = 5;
+    OUTPUT x;
+END
+"""
 lexer = Lexer(source)
 parser = Parser(lexer)
 interpreter = Interpreter(parser)
-result = interpreter.interpret()
-print(result)
+interpreter.interpret()
+print(interpreter.GLOBAL_SCOPE)

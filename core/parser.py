@@ -1,6 +1,6 @@
 from .token import Token, TokenType
 from .lexer import Lexer
-from .ast import BinOP, Num, UnaryOP
+from .ast import *
 from .nodevisitor import NodeVisitor
 from .exception import ExceptionHandler
 import logging
@@ -26,13 +26,114 @@ class Parser(NodeVisitor):
         if self.cur_token.type == token_type:
             self.cur_token = self.lexer.get_next_token()
         else:
-            self.logger.error(f"Token 1: {self.cur_token.type}. Token 2: {token_type}")
+            self.logger.error(f"Token 1: {self.cur_token.type}; Token 2: {token_type}")
             self.ExceptionHandler.raise_exception("Tokens do not match")
+    
+    def program(self) -> any:
+        """
+        Parses the program statement
+        Ruleset: <prgm> ::= <compound>
 
-    def factor(self) -> Num | BinOP:
+        :return: 
+        :rtype:
+        """
+        node = self.compound()
+        return node
+    
+    def compound(self) -> Compound:
+        """
+        Parses compound statements
+        Ruleset: <compound> ::= START <stmt_list> END
+
+        :return:
+        :rtype: Compound()
+        """
+        self.eat(TokenType.START)
+        nodes = self.statement_list()
+        self.eat(TokenType.END)
+
+        root = Compound()
+        for node in nodes:
+            root.children.append(node)
+        
+        return root
+    
+    def statement_list(self) -> list:
+        """
+        Parses statement lists (consecutive statements)
+        Ruleset: <stmt_list> ::= <stmt> | <stmt> <stmt_list>
+
+        :return:
+        :rtype: list
+        """
+        node = self.statement()
+        results = [node]
+
+        while self.cur_token.type != TokenType.EOF:
+            self.eat(TokenType.SEMI)
+            results.append(self.statement())
+        
+        if self.cur_token.type == TokenType.IDENTIFIER:
+            self.ExceptionHandler.raise_exception(f"Unexpected identifier: {self.cur_token.value}")
+        
+        return results
+    
+    def statement(self) -> Assign | Compound | NoOP:
+        """
+        Parses a statement
+        Ruleset: <stmt> ::= <compound> 
+            | <assignment>
+            | <empty>
+        
+        :return:
+        :rtype: Assign() | Compound() | NoOP()
+        """
+        if self.cur_token.type == TokenType.START:
+            node = self.compound()
+        elif self.cur_token.type == TokenType.IDENTIFIER:
+            node = self.assignment()
+        else:
+            node = self.empty()
+        return node
+    
+    def assignment(self) -> Assign:
+        """
+        Parses an assignment statement
+        Ruleset: <assignment> ::= LET <var> = <expr>
+
+        :rtype: Assign()
+        """
+        left = self.variable()
+        token = self.cur_token()
+        self.eat(TokenType.EQ)
+        right = self.expr()
+        node = Assign(left, token, right)
+        return node
+
+    def variable(self) -> Variable:
+        """
+        Parses a variable statement
+        Ruleset: <var> ::= <identifier>
+
+        :rtype: Variable()
+        """
+        node = Variable(self.cur_token)
+        self.eat(TokenType.IDENTIFIER)
+        return node
+    
+    def empty(self) -> NoOP:
+        """
+        Parses an empty statement
+        Ruleset: None
+
+        :rtype: NoOP()
+        """
+        return NoOP()
+
+    def factor(self) -> Num | BinOP | Variable:
         """
         Parses a factor statement
-        Ruleset: <factor> ::= [("-" | "+")] <factor> | <int> | <LPAREN> <expr> <RPAREN>
+        Ruleset: <factor> ::= [("-" | "+")] <factor> | <int> | <LPAREN> <expr> <RPAREN> | <var>
 
         :return: Evaluation result(s)
         :rtype: BinOP() | Num()
@@ -53,6 +154,9 @@ class Parser(NodeVisitor):
             self.eat(TokenType.LPAREN)
             node = self.expr()
             self.eat(TokenType.RPAREN)
+            return node
+        else:
+            node = self.variable()
             return node
 
     def term(self) -> BinOP:
@@ -104,4 +208,8 @@ class Parser(NodeVisitor):
         :return: Evaluation result(s)
         :rtype: BinOP()
         """
-        return self.expr()
+        node = self.program()
+        if self.cur_token.type != TokenType.EOF:
+            self.ExceptionHandler.raise_exception(f"EOF character expected, got {self.cur_token.type} instead")
+
+        return node

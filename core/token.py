@@ -2,16 +2,18 @@ import enum
 
 class TokenType(enum.Enum):
     # Format of token
-    # name: value
+    # name = value
 
     EOF = "EOF"
     NEWLINE = "NEWLINE"
     INTEGER = "INTEGER"
-    IDENT = "IDENT"
+    IDENTIFIER = "IDENTIFIER"
     STRING = "STRING"
     BOOL = "BOOL"
+    SEMI = ";"
+    DOT = "."
 
-    # Keywords
+    # Reserved Keywords
     INPUT = "INPUT"
     OUTPUT = "OUTPUT"
     IF = "IF"
@@ -26,6 +28,8 @@ class TokenType(enum.Enum):
     NEXT = "NEXT"
     TRUE = "TRUE"
     FALSE = "FALSE"
+    START = "START"
+    END = "END"
 
     # Operators
     EQ = "EQ"
@@ -41,6 +45,38 @@ class TokenType(enum.Enum):
     LTHAN = "LTHAN"
     LPAREN = "LPAREN"
     RPAREN = "RPAREN"
+
+    @classmethod
+    def get_values(cls, target: str, _default:  str = ""):
+        """
+        Searches the list of valid tokens and returns if there's a match
+
+        :param target: The target token type to find
+        :type target: str
+        :param _default: The value to return if no matches are found
+        :type _default: str
+        :return: The value of the matched token
+        :rtype: any
+        """
+        for member in cls:
+            if member.name == target:
+                return member.value
+        return _default
+    
+    @classmethod
+    def get_token_type(cls, target: str):
+        """
+        Searches the list of valid tokens and returns a token if there's a match
+
+        :param target: The target token type to find
+        :type target: str
+        :return: The object corrosponding to the matched token type
+        :rtype: TokenType()
+        """
+        for member in cls:
+            if member.name == target:
+                return member
+        return None
 
 
 class Token(object):
